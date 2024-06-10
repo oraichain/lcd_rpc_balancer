@@ -41,11 +41,11 @@ end
 
 local function get_block_height(response)
     -- moniker = '' then latest_block_height is at 705, we start at 600 is quite safe
-    local _, start_ind = string.find(response, "latest_block_height", 600)
+    local _, start_ind = string.find(response, "latest_block_height", 500)
     if start_ind == nil then
         return 0
     else
-        start_ind = start_ind + 5
+        start_ind = start_ind + 4
     end
 
     local _, end_ind = string.find(response, "\"", start_ind)
