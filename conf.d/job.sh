@@ -41,24 +41,24 @@ fi
 if [ -n "$IPS_INJ" ]; then
     sed -i.bak -E "s|^([[:space:]]+local[[:space:]]+inj_up[[:space:]]+=[[:space:]]+resty_roundrobin:new).*$|\1\(\{"$IPS_INJ"\}\)|" /etc/nginx/conf.d/default.conf
 else
-    curl -s -H "Content-Type: application/json" -X POST -d "$(generate_post_data "The string INJ is empty")" $discord_url
+    curl -s -H "Content-Type: application/json" -X POST -d "$(generate_post_data "The string INJECTIVE is empty")" $discord_url
 fi
 
 if [ -n "$IPS_TIA" ]; then
     sed -i.bak -E "s|^([[:space:]]+local[[:space:]]+tia_up[[:space:]]+=[[:space:]]+resty_roundrobin:new).*$|\1\(\{"$IPS_TIA"\}\)|" /etc/nginx/conf.d/default.conf
 else
-    curl -s -H "Content-Type: application/json" -X POST -d "$(generate_post_data "The string OSMO is empty")" $discord_url
+    curl -s -H "Content-Type: application/json" -X POST -d "$(generate_post_data "The string CELESTIA is empty")" $discord_url
 fi
 
 if [ -n "$IPS_DYM" ]; then
     sed -i.bak -E "s|^([[:space:]]+local[[:space:]]+dym_up[[:space:]]+=[[:space:]]+resty_roundrobin:new).*$|\1\(\{"$IPS_DYM"\}\)|" /etc/nginx/conf.d/default.conf
 else
-    curl -s -H "Content-Type: application/json" -X POST -d "$(generate_post_data "The string ATOM is empty")" $discord_url
+    curl -s -H "Content-Type: application/json" -X POST -d "$(generate_post_data "The string DYMENSION is empty")" $discord_url
 fi
 
 if [ -n "$IPS_NOBLE" ]; then
     sed -i.bak -E "s|^([[:space:]]+local[[:space:]]+noble_up[[:space:]]+=[[:space:]]+resty_roundrobin:new).*$|\1\(\{"$IPS_NOBLE"\}\)|" /etc/nginx/conf.d/default.conf
 else
-    curl -s -H "Content-Type: application/json" -X POST -d "$(generate_post_data "The string INJ is empty")" $discord_url
+    curl -s -H "Content-Type: application/json" -X POST -d "$(generate_post_data "The string NOBLE is empty")" $discord_url
 fi
 nginx -s reload
