@@ -3,14 +3,15 @@ services:
 
   ingress:
     container_name: ingress
-    image: openresty/openresty:alpine
+    build: .
     working_dir: /workspace
     restart: on-failure
-    tty: true 
-    ports:      
-      - 8080:80    
+    tty: true
+    ports:
+      - 80:80    
     volumes:
-      - ./conf.d:/etc/nginx/conf.d      
+      - ./conf.d:/etc/nginx/conf.d
       - ./lib:/workspace/lib
       - ./www:/var/www
-    command: tail -f /dev/null
+      - ./logs:/var/log/nginx
+      - ./nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf

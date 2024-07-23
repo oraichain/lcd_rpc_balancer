@@ -4,8 +4,12 @@ local tonumber = tonumber
 local setmetatable = setmetatable
 local math_random = math.random
 local error = error
+local cjson = require "cjson"
 local utils = require "resty.balancer.utils"
+local resty_env = require 'resty.env'
 
+local read_config = utils.read_config
+local read_file = utils.read_file
 local copy = utils.copy
 local nkeys = utils.nkeys
 
@@ -41,11 +45,11 @@ end
 
 local function get_block_height(response)
     -- moniker = '' then latest_block_height is at 705, we start at 600 is quite safe
-    local _, start_ind = string.find(response, "latest_block_height", 600)
+    local _, start_ind = string.find(response, "latest_block_height", 500)
     if start_ind == nil then
         return 0
     else
-        start_ind = start_ind + 5
+        start_ind = start_ind + 4
     end
 
     local _, end_ind = string.find(response, "\"", start_ind)
@@ -82,14 +86,17 @@ local function get_random_node_id(nodes)
 end
 
 
-function _M.new(_, nodes)
+function _M.new(_, filePath)
+    local nodes = read_config(filePath)
     local newnodes = copy(nodes)
     -- by default height is weight
     local heights = copy(nodes)
+    local response_time = copy(nodes)
     local only_key, gcd, max_weight = get_gcd(newnodes)
     local last_id = get_random_node_id(nodes)
 
     local self = {
+        response_time = response_time, -- ip => block_height
         heights = heights, -- ip => block_height
         nodes = newnodes, -- it's safer to copy one
         only_key = only_key,
@@ -179,19 +186,23 @@ function _M.set(self, id, w)
     return _decr(self, id, old_weight - new_weight)
 end
 
-local function update(self)
+local function update(self, port)
     local httpc = require("resty.http").new()
     -- timeout 5 seconds for reading
     httpc:set_timeouts(2000, 2000, 5000)
     for id, _ in next, self.heights do
         -- query block height to update the heights
-        local res, _ = httpc:request_uri('http://' .. id .. ':26657/status', {
+        local start_time = ngx.now()
+        local res, _ = httpc:request_uri('http://' .. id .. ':' .. port .. '/status', {
                 method = "GET",
             })
+        local end_time = ngx.now()
+        local response_time = end_time - start_time
         if res then
             local new_block_height = get_block_height(res.body)
             if new_block_height > 0 then
                 self.heights[id] = new_block_height
+                self.response_time[id] = math.floor(response_time * 1000 + 0.5)
             end
         end
     end
