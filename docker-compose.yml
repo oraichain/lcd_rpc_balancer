@@ -15,3 +15,10 @@ services:
       - ./www:/var/www
       - ./logs:/var/log/nginx
       - ./nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf
+    networks:
+      - net
+
+networks:
+  net:
+    name: net
+    external: true
