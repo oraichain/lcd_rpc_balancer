@@ -6,7 +6,6 @@ local math_random = math.random
 local error = error
 local cjson = require "cjson"
 local utils = require "resty.balancer.utils"
-local resty_env = require 'resty.env'
 
 local read_config = utils.read_config
 local read_file = utils.read_file
