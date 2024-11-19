@@ -10,7 +10,8 @@ RUN wget https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-City.mmdb 
 
 WORKDIR /workspace
 
-COPY . .
+COPY lib /workspace/lib
+COPY www /var/www
 
 EXPOSE 80 8080
 

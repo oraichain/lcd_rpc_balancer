@@ -44,22 +44,12 @@ local function get_gcd(nodes)
 end
 
 local function get_block_height(response)
-    -- moniker = '' then latest_block_height is at 705, we start at 600 is quite safe
-    local _, start_ind = string.find(response, "latest_block_height", 500)
-    if start_ind == nil then
+    local lua_table, err = cjson.decode(response)
+    if not lua_table then
         return 0
     else
-        start_ind = start_ind + 4
+        return tonumber(lua_table.result.response.last_block_height)
     end
-
-    local _, end_ind = string.find(response, "\"", start_ind)
-    if end_ind == nil then
-        return 0
-    else
-        end_ind = end_ind - 1
-    end
-
-    return tonumber(string.sub(response, start_ind, end_ind))
 end
 
 local function get_max_height(self)
@@ -193,7 +183,7 @@ local function update(self, port)
     for id, _ in next, self.heights do
         -- query block height to update the heights
         local start_time = ngx.now()
-        local res, _ = httpc:request_uri('http://' .. id .. ':' .. port .. '/status', {
+        local res, _ = httpc:request_uri('http://' .. id .. ':' .. port .. '/abci_info', {
                 method = "GET",
             })
         local end_time = ngx.now()
@@ -224,8 +214,8 @@ local function find(self)
             if not last_id then
                 break
             end
-
-            if self.heights[last_id] >= max_height and weight >= cw then
+	
+            if self.heights[last_id] >= max_height - self.gcd and weight >= cw then
                 self.cw = cw
                 self.last_id = last_id
                 return last_id
